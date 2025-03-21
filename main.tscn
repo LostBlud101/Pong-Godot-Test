@@ -1,0 +1,111 @@
+[gd_scene load_steps=9 format=3 uid="uid://b3bebptbhyfnc"]
+
+[ext_resource type="Script" uid="uid://ch43uuauuyfef" path="res://player.gd" id="1_0xm2m"]
+[ext_resource type="Texture2D" uid="uid://cfi756q03rkv8" path="res://05b4fbc3f169175e6deb97b3977175b6.jpg" id="2_h2yge"]
+[ext_resource type="Script" uid="uid://7jjoc8k3pu1h" path="res://ennemy.gd" id="3_1bvp3"]
+[ext_resource type="Script" uid="uid://rp1hvcefnghh" path="res://ball.gd" id="3_h2yge"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7dm0k"]
+size = Vector2(1163, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1bvp3"]
+size = Vector2(40.25, 175)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_h2yge"]
+bounce = 0.5
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lquwl"]
+size = Vector2(68, 64)
+
+[node name="Main" type="Node2D"]
+
+[node name="Top Wall" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Top Wall"]
+position = Vector2(571.5, 0)
+shape = SubResource("RectangleShape2D_7dm0k")
+
+[node name="BottomWall" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomWall"]
+position = Vector2(579, 652)
+shape = SubResource("RectangleShape2D_7dm0k")
+
+[node name="player" type="RigidBody2D" parent="." groups=["EnemeyOrPlayer"]]
+position = Vector2(43, 19)
+mass = 1000.0
+gravity_scale = 0.0
+lock_rotation = true
+script = ExtResource("1_0xm2m")
+
+[node name="Sprite2D" type="Sprite2D" parent="player" groups=["EnemeyOrPlayer"]]
+position = Vector2(41, 310)
+scale = Vector2(0.0550272, 0.133983)
+texture = ExtResource("2_h2yge")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="player" groups=["EnemeyOrPlayer"]]
+position = Vector2(40.875, 310.5)
+shape = SubResource("RectangleShape2D_1bvp3")
+
+[node name="Ennemy" type="RigidBody2D" parent="." groups=["EnemeyOrPlayer"]]
+position = Vector2(1015, 7)
+mass = 1000.0
+gravity_scale = 0.0
+lock_rotation = true
+script = ExtResource("3_1bvp3")
+
+[node name="Sprite2D" type="Sprite2D" parent="Ennemy" groups=["EnemeyOrPlayer"]]
+position = Vector2(41, 310)
+scale = Vector2(0.0550272, 0.133983)
+texture = ExtResource("2_h2yge")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ennemy" groups=["EnemeyOrPlayer"]]
+position = Vector2(40.875, 310.5)
+shape = SubResource("RectangleShape2D_1bvp3")
+
+[node name="Ball" type="RigidBody2D" parent="."]
+physics_material_override = SubResource("PhysicsMaterial_h2yge")
+gravity_scale = 0.0
+lock_rotation = true
+contact_monitor = true
+max_contacts_reported = 5
+script = ExtResource("3_h2yge")
+
+[node name="Sprite2D" type="Sprite2D" parent="Ball"]
+position = Vector2(585, 301)
+scale = Vector2(0.091712, 0.0481652)
+texture = ExtResource("2_h2yge")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ball"]
+position = Vector2(585, 301)
+shape = SubResource("RectangleShape2D_lquwl")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="Ball"]
+position = Vector2(584, 301)
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="UpButton" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 110.0
+offset_top = 518.0
+offset_right = 202.0
+offset_bottom = 623.0
+scale = Vector2(1.2, 1)
+
+[node name="DownButton" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 247.0
+offset_top = 518.0
+offset_right = 339.0
+offset_bottom = 623.0
+scale = Vector2(1.2, 1)
+
+[connection signal="body_entered" from="Ball" to="Ball" method="_on_body_entered"]
+[connection signal="screen_exited" from="Ball/VisibleOnScreenNotifier2D" to="Ball" method="_on_visible_on_screen_notifier_2d_screen_exited"]
+[connection signal="pressed" from="Control/UpButton" to="player" method="_on_up_button_pressed"]
+[connection signal="pressed" from="Control/DownButton" to="player" method="_on_down_button_pressed"]
