@@ -17,7 +17,11 @@ workflows:
         DOSSIER_BUILD: /Users/builder/Download/build
         DOSSIER_TEMPLATES: ${DOSSIER_EDITEUR}/export_templates
         PARAMETRES_GODOT: ${DOSSIER_EDITEUR}/editor_settings-${VERSION_PARAMETRES}.tres
-
+        VERSION_GODOT: 4.4-stable
+        VERSION_PARAMETRES: 4.4
+        VERSION_TEMPLATES: 4.4.stable
+        TYPE_DEXPORTATION: debug
+        FICHIER_DE_SORTIE: Pong-Godot-Test.apk
     scripts:
       # Téléchargement et décompression de l'archive de Godot -> Godot_v4.0-stable_macos.universal.zip
       - name: Installation de Godot
