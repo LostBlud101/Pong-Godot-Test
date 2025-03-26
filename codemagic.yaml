@@ -1,0 +1,82 @@
+workflows:
+  godot-android-workflow:
+    name: Godot Android Workflow
+    max_build_duration: 120
+    environment:
+      groups:
+        - godot
+      vars:
+        # L'URL de téléchargement de godot et des templates d'exportation
+        URL_TELECHARGEMENT: https://github.com/godotengine/godot-builds/releases/download/
+        # Le chemin ou sera stocké godot une fois qu'on aura décompressé l'archive contenant godot
+        CHEMIN_GODOT: Godot.app/Contents/MacOS/Godot
+        # Le chemin où ton projet github est stocké
+        CHEMIN_PROJET: /Users/builder/clone
+        # C'est dans ce dossier que se trouvent les paramètres de godot sur ce Mac
+        DOSSIER_EDITEUR: /Users/builder/Library/Application Support/Godot
+        DOSSIER_BUILD: /Users/builder/Download/build
+        DOSSIER_TEMPLATES: ${DOSSIER_EDITEUR}/export_templates
+        PARAMETRES_GODOT: ${DOSSIER_EDITEUR}/editor_settings-${VERSION_PARAMETRES}.tres
+
+    scripts:
+      # Téléchargement et décompression de l'archive de Godot -> Godot_v4.0-stable_macos.universal.zip
+      - name: Installation de Godot
+        script: |
+          cd ~/Downloads
+          export FICHIER=Godot_v${VERSION_GODOT}_macos.universal.zip
+          export URL=${URL_TELECHARGEMENT}/${VERSION_GODOT}/${FICHIER}
+          curl -L "$URL" -o "$FICHIER" && unzip "$FICHIER"
+          rm "$FICHIER"
+      
+      # Téléchargement et extraction des modèles d'exportation -> Godot_v4.0-stable_macos.universal.zip
+      # On obtient un dossier nommé "templates"
+      - name: Téléchargement des modèles d'exportation
+        script: |
+          cd ~/Downloads
+          export FICHIER=Godot_v${VERSION_GODOT}_export_templates.tpz
+          export URL=${URL_TELECHARGEMENT}/${VERSION_GODOT}/${FICHIER}
+          curl -L "$URL" -o "$FICHIER" && unzip "$FICHIER"
+          rm "$FICHIER"
+      
+      # Déplacement des modèles d'exportation, création du dossier d'exportation,
+      # création du debug.keystore et des paramètres de godot
+      - name: Configuration de l'exportation
+        script: |
+          cd ~/Downloads
+          export CHEMIN=${DOSSIER_TEMPLATES}/${VERSION_TEMPLATES}
+          mkdir -p "$CHEMIN" && mv templates/* "$CHEMIN"
+          rmdir templates
+          mkdir -p "$DOSSIER_BUILD"
+          export GODOT_KEYSTORE_PATH=$(pwd)/debug.keystore
+          keytool -genkeypair -v \
+          -keystore ${GODOT_KEYSTORE_PATH} \
+          -storepass android \
+          -alias androiddebugkey \
+          -keypass android \
+          -keyalg RSA \
+          -validity 10000 \
+          -dname "CN=Android Debug, O=Android, C=US"
+          cat <<EOF > "$PARAMETRES_GODOT"
+          [gd_resource type="EditorSettings" load_steps=2 format=3]
+
+          [resource]
+          export/android/android_sdk_path = "/usr/local/share/android-sdk"
+          export/android/debug_keystore = "${GODOT_KEYSTORE_PATH}"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          EOF
+          pwd && ls
+      
+      # - name: Décodage des presets d'exportation
+      #   script: echo $PRESETS_DEXPORTATION | base64 --decode > ./export_presets.cfg
+      
+      # Tout dépend de ta version de godot, avec godot 3 c'est différent, consulte https://docs.godotengine.org/en/latest/tutorials/editor/command_line_tutorial.html
+      - name: Exportation du projet
+        script: |
+          cd ~/Downloads
+          export CHEMIN_EXPORTATION=${DOSSIER_BUILD}/$FICHIER_DE_SORTIE
+          "$CHEMIN_GODOT" --headless --path "$CHEMIN_PROJET" --export-$TYPE_DEXPORTATION "Android" "$CHEMIN_EXPORTATION"
+    
+    artifacts:
+      - $DOSSIER_BUILD/*.apk
