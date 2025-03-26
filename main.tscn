@@ -105,6 +105,10 @@ offset_right = 339.0
 offset_bottom = 623.0
 scale = Vector2(1.2, 1)
 
+[node name="Timer" type="Timer" parent="."]
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Timer"]
+
 [connection signal="body_entered" from="Ball" to="Ball" method="_on_body_entered"]
 [connection signal="screen_exited" from="Ball/VisibleOnScreenNotifier2D" to="Ball" method="_on_visible_on_screen_notifier_2d_screen_exited"]
 [connection signal="pressed" from="Control/UpButton" to="player" method="_on_up_button_pressed"]
