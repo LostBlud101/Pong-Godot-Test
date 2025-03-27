@@ -80,7 +80,7 @@ workflows:
         script: |
           cd ~/Downloads
           export CHEMIN_EXPORTATION=${DOSSIER_BUILD}/$FICHIER_DE_SORTIE
-          "$CHEMIN_GODOT" --headless --path "$CHEMIN_PROJET" --export-$TYPE_DEXPORTATION Android "$CHEMIN_EXPORTATION"
+          "$CHEMIN_GODOT" --headless --path "$CHEMIN_PROJET" --export-$TYPE_DEXPORTATION "Android" "$CHEMIN_EXPORTATION"
     
     artifacts:
       - $DOSSIER_BUILD/*.apk
